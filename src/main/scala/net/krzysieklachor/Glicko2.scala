@@ -11,26 +11,19 @@ case object Win extends Result { val value = 1.0 }
 
 object Glicko2 {
 
+  /** Conversion between Glicko-1 and Glicko-2 systems */
   final val Glicko2Conversion = 173.7178
 
-  /*
-   * Should it be configurable per competition? Probably not. Should set to 6 months?
-   * The Glicko-2 system works
-   * best when the number of games in a rating period is moderate to large, say an average of at
-   * least 10-15 games per player in a rating period
-   */
-
-  /*
-   * 0.3 to 1.2. Smaller values prevent volatility from changing large amounts, which in turn
-   * prevents enormous changes in ratings based on very improbable results.
-   * The system should be tested to decide which value results in greatest predictive
-   * accuracy.
+  /**
+   * Set to a value between 0.3 and 1.2. Smaller values prevent volatility from changing large amounts,
+   * which in turn prevents enormous changes in ratings based on very improbable results. The system should be
+   * tested to decide which value results in greatest predictive accuracy.
    */
   final val Tau = 0.5
 
-  final val UnratedPlayerRatingG1 = 1500.0
-  final val UnratedPlayerRatingDeviationG1 = 350.0
-  final val UnratedPlayerVolatilityG1 = 0.06
+  final val NewPlayerRatingG1 = 1500.0
+  final val NewPlayerRatingDeviationG1 = 350.0
+  final val NewPlayerVolatilityG1 = 0.06
 
   /* helper function */
   def g(ratingDeviation: Double): Double = 1.0 / sqrt(1.0 + 3 * pow2(ratingDeviation) / pow2(PI))
@@ -58,9 +51,9 @@ case class Glicko1(
 }
 
 case class Glicko2(
-    rating: Double = (UnratedPlayerRatingG1 - 1500) / Glicko2Conversion,
-    ratingDeviation: Double = UnratedPlayerRatingDeviationG1 / Glicko2Conversion,
-    ratingVolatility: Double = UnratedPlayerVolatilityG1) {
+                    rating: Double = (NewPlayerRatingG1 - 1500) / Glicko2Conversion,
+                    ratingDeviation: Double = NewPlayerRatingDeviationG1 / Glicko2Conversion,
+                    ratingVolatility: Double = NewPlayerVolatilityG1) {
 
   def toGlicko1() = Glicko1(
     rating * Glicko2.Glicko2Conversion + 1500,
@@ -100,13 +93,11 @@ case class Glicko2(
 
   def calculateNewRating(opponents: Seq[(Glicko2, Result)]): Glicko2 = {
 
-    // step5 - calculate new volatility
     val convergenceTolerance = 0.000001 // convergence tolerance, epsilon
 
-    /*
-     * Based on the so-called “Illinois algorithm,” a variant of the regula falsi (false position) procedure.
-     * The algorithm takes advantage of the knowledge that the desired value of σ can be sandwiched
-     * at the start of the algorithm by the initial choices of A and B
+    /**
+     * Based on the so-called “Illinois algorithm”, the algorithm takes advantage of the knowledge that
+     * the desired value of σ can be sandwiched at the start of the algorithm by the initial choices of A and B
      */
     def newVolatility(): Double = {
 
@@ -148,18 +139,16 @@ case class Glicko2(
       exp(A / 2)
     }
 
-    /* step6 - update rating deviation to new pre-rating period value (decay RD) */
+    /** Update rating deviation to new pre-rating period value (decay rating deviation) */
     def preRatingPeriodRatingDeviation(): Double = {
       sqrt(pow2(this.ratingDeviation) + pow2(newVolatility))
     }
 
-    // step7a - calculate new RD
-    def newRD(): Double = {
+    def newRatingDeviation(): Double = {
       1.0 /
         sqrt(1.0 / pow2(preRatingPeriodRatingDeviation) + 1.0 / estimatedVariance(opponents))
     }
 
-    // step7b - calculate new rating
     def newRating: Double = {
 
       val sum = opponents.foldLeft(0.0)((acc, resultWithOpponent) => {
@@ -169,19 +158,21 @@ case class Glicko2(
           g(opponentGlicko2.ratingDeviation) *
           (result.value - E(rating, opponentGlicko2.rating, opponentGlicko2.ratingDeviation))
       })
-      rating + pow2(newRD) * sum
+      rating + pow2(newRatingDeviation) * sum
     }
 
-    Glicko2(newRating, newRD, newVolatility)
+    Glicko2(newRating, newRatingDeviation, newVolatility)
   }
 
   /**
-   * If a player does not compete during the rating period, then only Step 6 applies. In
-   * this case, the player’s rating and volatility parameters remain the same, but the rating deviation increases
-   * according to
+   * If a player does not compete during the rating period, the player’s rating and volatility parameters
+   * remain the same, but the rating deviation increases.
    *
-   *  @param n  number of rating periods to decay
-   *            //todo test
+   * The Glicko-2 system works best when the number of games in a rating period is moderate to large,
+   * i.e. at least 10-15 games per player in a rating period.
+   *
+   *  @param n number of rating periods to decay
+   *           //todo test
    */
   def decayRatingDeviation(n: Int): Glicko2 = {
 
@@ -191,5 +182,4 @@ case class Glicko2(
 
     Glicko2(rating, decayedRatingDeviation, ratingVolatility)
   }
-
 }
