@@ -25,10 +25,8 @@ object Glicko2 {
   final val NewPlayerRatingDeviationG1 = 350.0
   final val NewPlayerVolatilityG1 = 0.06
 
-  /* helper function */
   def g(ratingDeviation: Double): Double = 1.0 / sqrt(1.0 + 3 * pow2(ratingDeviation) / pow2(PI))
 
-  /* helper function */
   def E(rating: Double, opponentRating: Double, opponentRatingDeviation: Double): Double =
     1.0 / (1.0 + exp(-g(opponentRatingDeviation) * (rating - opponentRating)))
 
@@ -46,14 +44,14 @@ case class Glicko1(
     ratingVolatility
   )
 
-  override def toString(): String =
-    "rating: %1.0f, rd: %1.2f, volatility: %1.6f".format(rating, ratingDeviation, ratingVolatility)
+  override def toString() =
+    "rating: %1.0f, deviation: %1.2f, volatility: %1.6f".format(rating, ratingDeviation, ratingVolatility)
 }
 
 case class Glicko2(
-                    rating: Double = (NewPlayerRatingG1 - 1500) / Glicko2Conversion,
-                    ratingDeviation: Double = NewPlayerRatingDeviationG1 / Glicko2Conversion,
-                    ratingVolatility: Double = NewPlayerVolatilityG1) {
+    rating: Double = (NewPlayerRatingG1 - 1500) / Glicko2Conversion,
+    ratingDeviation: Double = NewPlayerRatingDeviationG1 / Glicko2Conversion,
+    ratingVolatility: Double = NewPlayerVolatilityG1) {
 
   def toGlicko1() = Glicko1(
     rating * Glicko2.Glicko2Conversion + 1500,
@@ -62,8 +60,7 @@ case class Glicko2(
   )
 
   /**
-   * Computes the quantity v. This is the estimated variance of the team’s/player’s
-   * rating based only on game outcomes
+   * Computes estimated variance of the player’s rating based on game outcomes
    */
   def estimatedVariance(opponents: Seq[(Glicko2, Result)]): Double = {
     val sum = opponents.foldLeft(0.0) { (acc, resultWithOpponent) =>
@@ -140,14 +137,11 @@ case class Glicko2(
     }
 
     /** Update rating deviation to new pre-rating period value (decay rating deviation) */
-    def preRatingPeriodRatingDeviation(): Double = {
+    def preRatingPeriodRatingDeviation(): Double =
       sqrt(pow2(this.ratingDeviation) + pow2(newVolatility))
-    }
 
-    def newRatingDeviation(): Double = {
-      1.0 /
-        sqrt(1.0 / pow2(preRatingPeriodRatingDeviation) + 1.0 / estimatedVariance(opponents))
-    }
+    def newRatingDeviation(): Double =
+      1.0 / sqrt(1.0 / pow2(preRatingPeriodRatingDeviation) + 1.0 / estimatedVariance(opponents))
 
     def newRating: Double = {
 
@@ -165,7 +159,7 @@ case class Glicko2(
   }
 
   /**
-   * If a player does not compete during the rating period, the player’s rating and volatility parameters
+   * If a player does not compete during the rating period their rating and volatility parameters
    * remain the same, but the rating deviation increases.
    *
    * The Glicko-2 system works best when the number of games in a rating period is moderate to large,
@@ -176,9 +170,9 @@ case class Glicko2(
    */
   def decayRatingDeviation(n: Int): Glicko2 = {
 
-    val decayedRatingDeviation = (0 until n).foldLeft(ratingDeviation)((a, b) =>
+    val decayedRatingDeviation = (0 until n).foldLeft(ratingDeviation) { (a, b) =>
       sqrt(pow2(a) + pow2(ratingVolatility))
-    )
+    }
 
     Glicko2(rating, decayedRatingDeviation, ratingVolatility)
   }

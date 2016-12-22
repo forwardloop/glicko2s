@@ -18,7 +18,7 @@ class Glicko2Spec extends Specification {
     (opponent3, Loss)
   )
 
-  "In Glicko-2 scale, test player’s rating and RD" should {
+  s"In Glicko-2 scale, player ($player) rating and RD" should {
     "be 0 and 1.1513" in {
       player.rating === 0.0
       round4(player.ratingDeviation) === 1.1513
@@ -92,13 +92,13 @@ class Glicko2Spec extends Specification {
       val str = newPlayerGlicko2
         .calculateNewRating(results)
         .toGlicko1().toString
-      str must be equalTo "rating: 1464, rd: 151.52, volatility: 0.059996"
+      str must be equalTo "rating: 1464, deviation: 151.52, volatility: 0.059996"
     }
   }
 
-  def round3(d: Double) = round(d, 3)
+  private def round3(d: Double) = round(d, 3)
 
-  def round4(d: Double) = round(d, 4)
+  private def round4(d: Double) = round(d, 4)
 
-  def round(d: Double, scale: Int) = BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP)
+  private def round(d: Double, scale: Int) = BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP)
 }
