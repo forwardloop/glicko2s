@@ -1,4 +1,4 @@
-package net.krzysieklachor
+package forwardloop
 
 import org.scalacheck._
 import org.scalacheck.Prop.forAll

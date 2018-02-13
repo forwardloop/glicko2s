@@ -1,8 +1,8 @@
-package net.krzysieklachor
+package forwardloop
 
 import java.lang.Math.{ PI, abs, exp, log, sqrt }
 
-import net.krzysieklachor.Glicko2._
+import forwardloop.Glicko2._
 
 sealed trait Result { def value: Double }
 case object Loss extends Result { val value = 0.0 }
@@ -15,7 +15,7 @@ object Glicko2 {
   final val Glicko2Conversion = 173.7178
 
   /**
-   * Set to a value between 0.3 and 1.2. Smaller values prevent volatility from changing large amounts,
+   * Set between 0.3 and 1.2. Smaller values prevent volatility from changing large amounts,
    * which in turn prevents enormous changes in ratings based on very improbable results. The system should be
    * tested to decide which value results in greatest predictive accuracy.
    */

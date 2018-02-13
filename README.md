@@ -2,4 +2,4 @@
 [![Coverage Status](https://coveralls.io/repos/github/forwardloop/glicko2s/badge.svg?branch=master)](https://coveralls.io/github/forwardloop/glicko2s?branch=master)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Glicko2 sport players' rating algorithm in Scala 
+Glicko2 sport players' rating algorithm for JVM 
