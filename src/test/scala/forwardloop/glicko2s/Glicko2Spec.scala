@@ -1,6 +1,7 @@
-package forwardloop
+package forwardloop.glicko2s
 
 import org.specs2.mutable.Specification
+
 import scala.math.BigDecimal.RoundingMode
 
 class Glicko2Spec extends Specification {
@@ -70,7 +71,6 @@ class Glicko2Spec extends Specification {
 
   "Computing the quantity v (the estimated variance)" should {
     "return 1.7785" in {
-      //      val expected =  1.7785
       val expected = 1.7790
       val result = player.estimatedVariance(results)
       round4(result) === expected
@@ -79,7 +79,6 @@ class Glicko2Spec extends Specification {
 
   "Computing the quantity ∆ (the estimated improvement in rating)" should {
     "return −0.4834" in {
-      //      val expected = -0.4834
       val expected = -0.4839
       val result = player.estimatedImprovement(results)
       round4(result) === expected

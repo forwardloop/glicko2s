@@ -1,8 +1,6 @@
-package forwardloop
+package forwardloop.glicko2s
 
 import java.lang.Math.{ PI, abs, exp, log, sqrt }
-
-import forwardloop.Glicko2._
 
 sealed trait Result { def value: Double }
 case object Loss extends Result { val value = 0.0 }
@@ -49,9 +47,11 @@ case class Glicko1(
 }
 
 case class Glicko2(
-    rating: Double = (NewPlayerRatingG1 - 1500) / Glicko2Conversion,
-    ratingDeviation: Double = NewPlayerRatingDeviationG1 / Glicko2Conversion,
-    ratingVolatility: Double = NewPlayerVolatilityG1) {
+    rating: Double = (Glicko2.NewPlayerRatingG1 - 1500) / Glicko2.Glicko2Conversion,
+    ratingDeviation: Double = Glicko2.NewPlayerRatingDeviationG1 / Glicko2.Glicko2Conversion,
+    ratingVolatility: Double = Glicko2.NewPlayerVolatilityG1) {
+
+  import Glicko2._
 
   def toGlicko1() = Glicko1(
     rating * Glicko2.Glicko2Conversion + 1500,

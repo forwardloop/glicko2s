@@ -1,6 +1,6 @@
 name := """glicko2s"""
 
-version := "0.9"
+version := "0.9.1"
 
 scalaVersion := "2.11.12"
 
@@ -22,7 +22,7 @@ publishMavenStyle := true
 sonatypeProfileName := "com.github.forwardloop"
 organization := "com.github.forwardloop"
 
-// Add sonatype repository settings
+// Sonatype repo settings
 publishTo := Some(
   if (isSnapshot.value)
     Opts.resolver.sonatypeSnapshots

@@ -1,7 +1,6 @@
-package forwardloop
+package forwardloop.glicko2s
 
 import org.scalacheck._
-import org.scalacheck.Prop.forAll
 
 object Glicko2PropSpec extends Properties("String") {
 
