@@ -4,3 +4,19 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.forwardloop/glicko2s_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.forwardloop/glicko2s_2.11)
 
 Glicko2 sport players' rating algorithm for JVM 
+
+## sbt
+
+```
+libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9"
+```
+
+## Maven 
+
+```
+<dependency>
+    <groupId>com.github.forwardloop</groupId>
+    <artifactId>glicko2s_2.11</artifactId>
+    <version>0.9</version>
+</dependency>
+```
