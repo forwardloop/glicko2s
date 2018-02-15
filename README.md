@@ -8,7 +8,7 @@ Glicko2 sport players' rating algorithm for JVM
 ## sbt
 
 ```
-libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9"
+libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9.1"
 ```
 
 ## Maven 
@@ -17,6 +17,6 @@ libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9"
 <dependency>
     <groupId>com.github.forwardloop</groupId>
     <artifactId>glicko2s_2.11</artifactId>
-    <version>0.9</version>
+    <version>0.9.1</version>
 </dependency>
 ```
