@@ -15,14 +15,14 @@ Glicko2 sport players' rating algorithm for the JVM
     <dependency>
         <groupId>com.github.forwardloop</groupId>
         <artifactId>glicko2s_2.11</artifactId>
-        <version>0.9.1</version>
+        <version>0.9.2</version>
     </dependency>
 ```
 
 ### sbt
 
 ```scala
-    libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9.1"
+    libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9.2"
 ```
 
 ### Java
@@ -33,16 +33,18 @@ Glicko2 sport players' rating algorithm for the JVM
      import scala.Tuple2;
      import java.util.Arrays;
      import java.util.List;
-     
+```
+
+```java
      Glicko2 playerRating = newPlayerRating();
      Glicko2 opponent1 = newPlayerRating();
      Glicko2 opponent2 = newPlayerRating();
     
-     Tuple2<Glicko2, Result> g1 = new Tuple2(opponent1, Glicko2J.Win);
-     Tuple2<Glicko2, Result> g2 = new Tuple2(opponent2, Glicko2J.Loss);
-     Tuple2<Glicko2, Result> g3 = new Tuple2(opponent1, Glicko2J.Win);
+     Tuple2<Glicko2, Result> match1 = new Tuple2(opponent1, Glicko2J.Win);
+     Tuple2<Glicko2, Result> match2 = new Tuple2(opponent2, Glicko2J.Loss);
+     Tuple2<Glicko2, Result> match3 = new Tuple2(opponent1, Glicko2J.Win);
     
-     List<Tuple2<Glicko2, Result>> results = Arrays.asList(g1, g2, g3);
+     List<Tuple2<Glicko2, Result>> results = Arrays.asList(match1, match2, match3);
     
      Glicko2 newRating = Glicko2J.calculateNewRating(playerRating, results);
      

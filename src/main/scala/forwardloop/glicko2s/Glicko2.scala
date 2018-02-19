@@ -160,13 +160,12 @@ case class Glicko2(
 
   /**
    * If a player does not compete during the rating period their rating and volatility parameters
-   * remain the same, but the rating deviation increases.
+   * remain the same but the rating deviation increases.
    *
    * The Glicko-2 system works best when the number of games in a rating period is moderate to large,
    * i.e. at least 10-15 games per player in a rating period.
    *
    *  @param n number of rating periods to decay
-   *           //todo test
    */
   def decayRatingDeviation(n: Int): Glicko2 = {
 
