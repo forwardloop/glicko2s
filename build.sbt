@@ -1,12 +1,13 @@
 name := """glicko2s"""
 
-version := "0.9.1"
+version := "0.9.2"
 
 scalaVersion := "2.11.12"
 
 libraryDependencies ++= Seq(
   "org.specs2" %% "specs2-core" % "3.8.5" % "test",
-  "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
+  "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
+  "junit" % "junit" % "4.12" % "test"
 )
 
 // POM settings for Sonatype
