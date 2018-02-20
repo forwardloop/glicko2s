@@ -5,7 +5,10 @@
 
 # glicko2s
 
-Glicko2 sport players' rating algorithm for the JVM 
+Glicko2 sport players' rating algorithm for the JVM.
+ 
+Project is used for computing ELO ratings in the [squash players](http://www.squashpoints.com) ranking system, for example in
+[Waterfront](http://www.squashpoints.com/leagues/7232/public/latest) or [Fareham Leisure Centre](http://www.squashpoints.com/leagues/7182/public/latest) leagues. 
 
 ## Usage
 
