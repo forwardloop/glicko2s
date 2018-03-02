@@ -5,28 +5,38 @@
 
 # glicko2s
 
-Glicko2 sport players' rating algorithm for the JVM.
- 
-Project is used for computing ELO ratings in the [squash players](http://www.squashpoints.com) ranking system, for example in
-[Waterfront](http://www.squashpoints.com/leagues/7232/public/latest) and [Fareham Leisure Centre](http://www.squashpoints.com/leagues/7182/public/latest) leagues. 
+Glicko2 sport players' rating algorithm for the JVM. Details on ELO and Glicko systems can be found in [ELO Wikipedia](https://en.wikipedia.org/wiki/Elo_rating_system), [Glicko Wikipedia](https://en.wikipedia.org/wiki/Glicko_rating_system),
+or [Glicko-2 Example](http://www.glicko.net/glicko/glicko2.pdf). The project is used for computing ELO ratings in the [squash players](http://www.squashpoints.com) ranking system, for example in
+[Waterfront](http://www.squashpoints.com/leagues/7232/public/latest) and [Fareham Leisure Centre](http://www.squashpoints.com/leagues/7182/public/latest) leagues. It is cross-compiled for Scala 2.11 and 2.12.
 
-## Usage
+## Build
 
 ### Maven 
 
 ```xml
     <dependency>
         <groupId>com.github.forwardloop</groupId>
-        <artifactId>glicko2s_2.11</artifactId>
-        <version>0.9.2</version>
+        <artifactId>glicko2s_2.12</artifactId>
+        <version>0.9.3</version>
     </dependency>
+```
+
+### Gradle
+
+```
+compile 'com.github.forwardloop:glicko2s_2.12:0.9.3'
 ```
 
 ### sbt
 
 ```scala
-    libraryDependencies += "com.github.forwardloop" % "glicko2s_2.11" % "0.9.2"
+    libraryDependencies += "com.github.forwardloop" %% "glicko2s" % "0.9.3"
 ```
+
+
+## Usage
+
+Compute new rating for a player based on a sequence of match results with other players:
 
 ### Java
  
@@ -48,11 +58,7 @@ Project is used for computing ELO ratings in the [squash players](http://www.squ
      Tuple2<Glicko2, Result> match3 = new Tuple2(opponent1, Glicko2J.Win);
     
      List<Tuple2<Glicko2, Result>> results = Arrays.asList(match1, match2, match3);
-    
      Glicko2 newRating = Glicko2J.calculateNewRating(playerRating, results);
-     
-     //playerRating.toGlicko1: rating: 1500, deviation: 350.00, volatility: 0.060000
-     //newRating.toGlicko1:    rating: 1600, deviation: 227.74, volatility: 0.059998
 ``` 
 
 ### Scala
@@ -63,11 +69,11 @@ Project is used for computing ELO ratings in the [squash players](http://www.squ
     val playerRating, opponent1, opponent2 = new Glicko2
     val results = List((opponent1, Win), (opponent2, Loss), (opponent1, Win))
     val newRating = playerRating.calculateNewRating(results)
-    
+```
+
+The rating, deviation and volatility parameters will change as follows:
+
+```scala
     //playerRating.toGlicko1: rating: 1500, deviation: 350.00, volatility: 0.060000
     //newRating.toGlicko1:    rating: 1600, deviation: 227.74, volatility: 0.059998
-```
- 
-
-
-
+```    

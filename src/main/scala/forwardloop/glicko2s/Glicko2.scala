@@ -1,6 +1,6 @@
 package forwardloop.glicko2s
 
-import java.lang.Math.{ PI, abs, exp, log, sqrt }
+import java.lang.Math.{ PI, abs, exp, log, sqrt, pow }
 
 sealed trait Result { def value: Double }
 case object Loss extends Result { val value = 0.0 }
@@ -15,29 +15,45 @@ object Glicko2 {
   /**
    * Set between 0.3 and 1.2. Smaller values prevent volatility from changing large amounts,
    * which in turn prevents enormous changes in ratings based on very improbable results. The system should be
-   * tested to decide which value results in greatest predictive accuracy.
+   * tested to decide which value results in greatest predictive accuracy
    */
   final val Tau = 0.5
 
+  /**
+   * Defaults assigned to new/unrelated players. `NewPlayerRatingG1` is an average club player rating
+   */
   final val NewPlayerRatingG1 = 1500.0
   final val NewPlayerRatingDeviationG1 = 350.0
   final val NewPlayerVolatilityG1 = 0.06
 
-  def g(ratingDeviation: Double): Double = 1.0 / sqrt(1.0 + 3 * pow2(ratingDeviation) / pow2(PI))
+  /* Helper functions */
+
+  def g(ratingDeviation: Double): Double = 1.0 / sqrt(1.0 + 3 * pow(ratingDeviation, 2) / pow(PI, 2))
 
   def E(rating: Double, opponentRating: Double, opponentRatingDeviation: Double): Double =
     1.0 / (1.0 + exp(-g(opponentRatingDeviation) * (rating - opponentRating)))
 
-  private def pow2(op: Double): Double = op * op
+  private def pow2(op: Double) = pow(op, 2)
 }
 
+/**
+ * The rating scale for Glicko-2 is different from that of the original Glicko-1 system.
+ * Ratings are normally presented in ELO/Glicko-1 scale, but the formulas operate to the Glicko-2 scale hence
+ * conversions are necessary.
+ *
+ * @param rating a player's rating in Glicko1 scale. `NewPlayerRatingG1 = 1500.0` is the default rating often
+ *               assigned to new players not previously rated
+ * @param ratingDeviation confidence in accuracy of a player's rating
+ * @param ratingVolatility degree of expected fluctuation in a player's rating. High when a player has erratic
+ *                         performances, low if performs at a consistent level
+ */
 case class Glicko1(
     rating: Double,
     ratingDeviation: Double,
     ratingVolatility: Double) {
 
   def toGlicko2() = Glicko2(
-    (rating - 1500) / Glicko2.Glicko2Conversion,
+    (rating - Glicko2.NewPlayerRatingG1) / Glicko2.Glicko2Conversion,
     ratingDeviation / Glicko2.Glicko2Conversion,
     ratingVolatility
   )
@@ -47,15 +63,15 @@ case class Glicko1(
 }
 
 case class Glicko2(
-    rating: Double = (Glicko2.NewPlayerRatingG1 - 1500) / Glicko2.Glicko2Conversion,
+    rating: Double = 0.0,
     ratingDeviation: Double = Glicko2.NewPlayerRatingDeviationG1 / Glicko2.Glicko2Conversion,
     ratingVolatility: Double = Glicko2.NewPlayerVolatilityG1) {
 
   import Glicko2._
 
   def toGlicko1() = Glicko1(
-    rating * Glicko2.Glicko2Conversion + 1500,
-    ratingDeviation * Glicko2.Glicko2Conversion,
+    rating * Glicko2Conversion + NewPlayerRatingG1,
+    ratingDeviation * Glicko2Conversion,
     ratingVolatility
   )
 
@@ -165,14 +181,14 @@ case class Glicko2(
    * The Glicko-2 system works best when the number of games in a rating period is moderate to large,
    * i.e. at least 10-15 games per player in a rating period.
    *
-   *  @param n number of rating periods to decay
+   *  @param idleRatingPeriods number of rating periods a player has not competed
    */
-  def decayRatingDeviation(n: Int): Glicko2 = {
+  def ratingDeviationForIdle(idleRatingPeriods: Int): Glicko2 = {
 
-    val decayedRatingDeviation = (0 until n).foldLeft(ratingDeviation) { (a, b) =>
-      sqrt(pow2(a) + pow2(ratingVolatility))
+    val idleRatingDeviation = (0 until idleRatingPeriods).foldLeft(ratingDeviation) { (rd, _) =>
+      sqrt(pow2(rd) + pow2(ratingVolatility))
     }
 
-    Glicko2(rating, decayedRatingDeviation, ratingVolatility)
+    Glicko2(rating, idleRatingDeviation, ratingVolatility)
   }
 }

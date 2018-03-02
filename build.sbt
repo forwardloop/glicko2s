@@ -1,11 +1,12 @@
 name := """glicko2s"""
 
-version := "0.9.2"
+version := "0.9.3"
 
 scalaVersion := "2.11.12"
+crossScalaVersions := Seq("2.11.12", "2.12.4")
 
 libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2-core" % "3.8.5" % "test",
+  "org.specs2" %% "specs2-core" % "4.0.2" % "test",
   "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
   "junit" % "junit" % "4.12" % "test"
 )

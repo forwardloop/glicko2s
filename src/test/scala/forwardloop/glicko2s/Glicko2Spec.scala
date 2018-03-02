@@ -6,10 +6,10 @@ import scala.math.BigDecimal.RoundingMode
 
 class Glicko2Spec extends Specification {
 
-  final val player = Glicko1(1500.0, 200.0, 0.06).toGlicko2()
-  final val opponent1 = Glicko1(1400.0, 30.0, 0.06).toGlicko2()
-  final val opponent2 = Glicko1(1550.0, 100.0, 0.06).toGlicko2()
-  final val opponent3 = Glicko1(1700.0, 300.0, 0.06).toGlicko2()
+  final val player = g2(1500.0, 200.0, 0.06)
+  final val opponent1 = g2(1400.0, 30.0, 0.06)
+  final val opponent2 = g2(1550.0, 100.0, 0.06)
+  final val opponent3 = g2(1700.0, 300.0, 0.06)
 
   final val opponents = List(opponent1, opponent2, opponent3)
 
@@ -18,6 +18,9 @@ class Glicko2Spec extends Specification {
     (opponent2, Loss),
     (opponent3, Loss)
   )
+
+  def g2(ratingG1: Double, ratingDeviationG1: Double, volatilityG1: Double) =
+    Glicko1(ratingG1, ratingDeviationG1, volatilityG1).toGlicko2()
 
   s"In Glicko-2 scale, player ($player) rating and RD" should {
     "be 0 and 1.1513" in {
@@ -87,11 +90,36 @@ class Glicko2Spec extends Specification {
 
   "Calculate a new player's rating after three matches with three players" should {
     "give expected result" in {
-      val newPlayerGlicko2 = Glicko1(1500.0, 200.0, 0.06).toGlicko2
-      val str = newPlayerGlicko2
+      g2(1500.0, 200.0, 0.06)
         .calculateNewRating(results)
-        .toGlicko1().toString
-      str must be equalTo "rating: 1464, deviation: 151.52, volatility: 0.059996"
+        .toGlicko1().toString must be equalTo "rating: 1464, deviation: 151.52, volatility: 0.059996"
+    }
+  }
+
+  "Compute rating deviation for idle player" should {
+    "not increase deviation for 0 periods" in {
+      round3(
+        player
+          .ratingDeviationForIdle(0)
+          .toGlicko1()
+          .ratingDeviation
+      ) === 200.0
+    }
+    "increase deviation for 1 period" in {
+      round3(
+        player
+          .ratingDeviationForIdle(1)
+          .toGlicko1()
+          .ratingDeviation
+      ) === 200.271
+    }
+    "increase deviation for 2 periods" in {
+      round3(
+        player
+          .ratingDeviationForIdle(2)
+          .toGlicko1()
+          .ratingDeviation
+      ) === 200.542
     }
   }
 
