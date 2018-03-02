@@ -36,6 +36,8 @@ object Glicko2 {
   private def pow2(op: Double) = pow(op, 2)
 }
 
+import Glicko2._
+
 /**
  * The rating scale for Glicko-2 is different from that of the original Glicko-1 system.
  * Ratings are normally presented in ELO/Glicko-1 scale, but the formulas operate to the Glicko-2 scale hence
@@ -53,8 +55,8 @@ case class Glicko1(
     ratingVolatility: Double) {
 
   def toGlicko2() = Glicko2(
-    (rating - Glicko2.NewPlayerRatingG1) / Glicko2.Glicko2Conversion,
-    ratingDeviation / Glicko2.Glicko2Conversion,
+    (rating - NewPlayerRatingG1) / Glicko2Conversion,
+    ratingDeviation / Glicko2Conversion,
     ratingVolatility
   )
 
@@ -66,8 +68,6 @@ case class Glicko2(
     rating: Double = 0.0,
     ratingDeviation: Double = Glicko2.NewPlayerRatingDeviationG1 / Glicko2.Glicko2Conversion,
     ratingVolatility: Double = Glicko2.NewPlayerVolatilityG1) {
-
-  import Glicko2._
 
   def toGlicko1() = Glicko1(
     rating * Glicko2Conversion + NewPlayerRatingG1,
