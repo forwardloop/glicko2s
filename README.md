@@ -5,8 +5,8 @@
 
 # glicko2s
 
-Glicko2 sport players' rating algorithm for the JVM. Details on ELO and Glicko systems can be found in [ELO Wikipedia](https://en.wikipedia.org/wiki/Elo_rating_system), [Glicko Wikipedia](https://en.wikipedia.org/wiki/Glicko_rating_system),
-or [Glicko-2 Example](http://www.glicko.net/glicko/glicko2.pdf). The project is used for computing ELO ratings in the [squash players](http://www.squashpoints.com) ranking system, for example in
+Glicko2 sport players' rating algorithm for the JVM. Details on ELO and Glicko systems can be found at [ELO Wikipedia](https://en.wikipedia.org/wiki/Elo_rating_system), [Glicko Wikipedia](https://en.wikipedia.org/wiki/Glicko_rating_system),
+or [Glicko-2 Example](http://www.glicko.net/glicko/glicko2.pdf). This project is used for computing ELO ratings in the [squash players](http://www.squashpoints.com) ranking system, for example in
 [Waterfront](http://www.squashpoints.com/leagues/7232/public/latest) and [Fareham Leisure Centre](http://www.squashpoints.com/leagues/7182/public/latest) leagues. It is cross-compiled for Scala 2.11 and 2.12.
 
 ## Build
@@ -24,7 +24,7 @@ or [Glicko-2 Example](http://www.glicko.net/glicko/glicko2.pdf). The project is 
 ### Gradle
 
 ```
-compile 'com.github.forwardloop:glicko2s_2.12:0.9.3'
+    compile 'com.github.forwardloop:glicko2s_2.12:0.9.3'
 ```
 
 ### sbt
@@ -71,7 +71,7 @@ Compute new rating for a player based on a sequence of match results with other 
     val newRating = playerRating.calculateNewRating(results)
 ```
 
-The rating, deviation and volatility parameters will change as follows:
+The rating, rating deviation and volatility parameters will change as follows:
 
 ```scala
     //playerRating.toGlicko1: rating: 1500, deviation: 350.00, volatility: 0.060000
