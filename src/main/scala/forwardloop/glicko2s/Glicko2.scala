@@ -28,7 +28,7 @@ object Glicko2 {
 
   /* Helper functions */
 
-  def g(ratingDeviation: Double): Double = 1.0 / sqrt(1.0 + 3 * pow(ratingDeviation, 2) / pow(PI, 2))
+  def g(ratingDeviation: Double): Double = 1.0 / sqrt(1.0 + 3 * pow2(ratingDeviation) / pow2(PI))
 
   def E(rating: Double, opponentRating: Double, opponentRatingDeviation: Double): Double =
     1.0 / (1.0 + exp(-g(opponentRatingDeviation) * (rating - opponentRating)))
@@ -78,14 +78,14 @@ case class Glicko2(
   /**
    * Computes estimated variance of the player’s rating based on game outcomes
    */
-  def estimatedVariance(opponents: Seq[(Glicko2, Result)]): Double = {
+  def estimatedVariance(implicit opponents: Seq[(Glicko2, Result)]): Double = {
     val sum = opponents.foldLeft(0.0) { (acc, resultWithOpponent) =>
-      val (opponentGlicko2, result) = resultWithOpponent
+      val (opponent, _) = resultWithOpponent
 
       acc + {
-        pow2(g(opponentGlicko2.ratingDeviation)) *
-          E(rating, opponentGlicko2.rating, opponentGlicko2.ratingDeviation) *
-          (1 - E(rating, opponentGlicko2.rating, opponentGlicko2.ratingDeviation))
+        pow2(g(opponent.ratingDeviation)) *
+          E(rating, opponent.rating, opponent.ratingDeviation) *
+          (1 - E(rating, opponent.rating, opponent.ratingDeviation))
       }
     }
     1.0 / sum
@@ -95,7 +95,7 @@ case class Glicko2(
    * Computes the quantity ∆, the estimated improvement in rating by comparing the
    * pre-period rating to the performance rating based only on game outcomes
    */
-  def estimatedImprovement(opponents: Seq[(Glicko2, Result)]) = {
+  def estimatedImprovement(implicit opponents: Seq[(Glicko2, Result)]) = {
     val sum = opponents.foldLeft(0.0) { (acc, resultWithOpponent) =>
       val (opponentGlicko2, result) = resultWithOpponent
       acc + g(opponentGlicko2.ratingDeviation) *
@@ -104,47 +104,49 @@ case class Glicko2(
     estimatedVariance(opponents) * sum
   }
 
-  def calculateNewRating(opponents: Seq[(Glicko2, Result)]): Glicko2 = {
+  def calculateNewRating(implicit opponents: Seq[(Glicko2, Result)]): Glicko2 = {
 
-    val convergenceTolerance = 0.000001 // convergence tolerance, epsilon
+    val ε = 0.000001 // convergence tolerance
+    val v = estimatedVariance
+    val ∆ = estimatedImprovement
+    val φ = ratingDeviation
+    val σ = ratingVolatility
+    val τ = Glicko2.Tau
 
     /**
      * Based on the so-called “Illinois algorithm”, the algorithm takes advantage of the knowledge that
      * the desired value of σ can be sandwiched at the start of the algorithm by the initial choices of A and B
      */
-    def newVolatility(): Double = {
+    val newVolatility = {
 
-      def a(): Double = log(pow2(ratingVolatility))
+      val a = log(pow2(σ))
 
-      def f(x: Double): Double = {
-        (exp(x) * (pow2(estimatedImprovement(opponents)) - pow2(ratingDeviation) - estimatedVariance(opponents) - exp(x))) /
-          (2.0 * pow2(pow2(ratingDeviation) + estimatedVariance(opponents) + exp(x))) -
-          (x - a) / pow2(Glicko2.Tau)
-      }
+      def f(x: Double): Double =
+        (exp(x) * (pow2(∆) - pow2(φ) - v - exp(x))) /
+          (2.0 * pow2(pow2(φ) + v + exp(x))) -
+          (x - a) / pow2(τ)
 
       var A: Double = a
       var B: Double =
-        if (pow2(estimatedImprovement(opponents)) > pow2(ratingDeviation)) {
-          log(pow2(estimatedImprovement(opponents)) - pow2(ratingDeviation) - estimatedVariance(opponents))
-        } else {
+        if (pow2(∆) > pow2(φ) + v)
+          log(pow2(∆) - pow2(φ) - v)
+        else {
           var k = 1
-          while (f(a - k * sqrt(pow2(Glicko2.Tau))) < 0) {
-            k += 1
-          }
-          a - k * sqrt(pow2(Glicko2.Tau))
+          while (f(a - k * τ) < 0) k += 1
+          a - k * τ
         }
+
+      /* A and B chosen to bracket ln(pow2(σ'), remainder of the algorithm iteratively narrows this bracket */
 
       var fA = f(A)
       var fB = f(B)
-      while (abs(B - A) > convergenceTolerance) {
-        val C: Double = A + (A - B) * fA / (fB - fA)
+      while (abs(B - A) > ε) {
+        val C = A + (A - B) * fA / (fB - fA)
         val fC = f(C)
         if (fC * fB < 0) {
           A = B
           fA = fB
-        } else {
-          fA = fA / 2
-        }
+        } else fA = fA / 2
         B = C
         fB = fC
       }
@@ -152,21 +154,18 @@ case class Glicko2(
       exp(A / 2)
     }
 
-    /** Update rating deviation to new pre-rating period value (decay rating deviation) */
-    def preRatingPeriodRatingDeviation(): Double =
-      sqrt(pow2(this.ratingDeviation) + pow2(newVolatility))
+    /* Update rating deviation to new pre-rating period value */
+    val preRatingPeriod_φ = sqrt(pow2(φ) + pow2(newVolatility))
 
-    def newRatingDeviation(): Double =
-      1.0 / sqrt(1.0 / pow2(preRatingPeriodRatingDeviation) + 1.0 / estimatedVariance(opponents))
+    val newRatingDeviation = 1.0 / sqrt(1.0 / pow2(preRatingPeriod_φ) + 1.0 / v)
 
-    def newRating: Double = {
-
+    val newRating = {
       val sum = opponents.foldLeft(0.0)((acc, resultWithOpponent) => {
-        val (opponentGlicko2, result) = resultWithOpponent
+        val (opponent, result) = resultWithOpponent
 
         acc +
-          g(opponentGlicko2.ratingDeviation) *
-          (result.value - E(rating, opponentGlicko2.rating, opponentGlicko2.ratingDeviation))
+          g(opponent.ratingDeviation) *
+          (result.value - E(rating, opponent.rating, opponent.ratingDeviation))
       })
       rating + pow2(newRatingDeviation) * sum
     }
