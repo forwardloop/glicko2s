@@ -9,8 +9,8 @@ import java.util.List;
  */
 public class Glicko2J {
 
-    public static final Result Win = Win$.MODULE$;
-    public static final Result Loss = Loss$.MODULE$;
+    public static final EloResult Win = Win$.MODULE$;
+    public static final EloResult Loss = Loss$.MODULE$;
 
     public static Glicko2 newPlayerRating() {
         return new Glicko1(
@@ -19,7 +19,7 @@ public class Glicko2J {
                 Glicko2.NewPlayerVolatilityG1()).toGlicko2();
     }
 
-    public static Glicko2 calculateNewRating(Glicko2 baseRating, List<Tuple2<Glicko2, Result>> results){
+    public static Glicko2 calculateNewRating(Glicko2 baseRating, List<Tuple2<Glicko2, EloResult>> results){
         return baseRating.calculateNewRating( JavaConversions.asScalaBuffer(results).toSeq() );
     }
 }

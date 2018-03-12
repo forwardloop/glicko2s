@@ -1,6 +1,6 @@
 name := """glicko2s"""
 
-version := "0.9.3"
+version := "0.9.4-SNAPSHOT"
 
 scalaVersion := "2.11.12"
 crossScalaVersions := Seq("2.11.12", "2.12.4")

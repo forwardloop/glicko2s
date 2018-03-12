@@ -49,7 +49,7 @@ Compute new rating for a player based on a sequence of match results with other 
 ```
 
 ```java
-     Glicko2 playerRating = newPlayerRating();
+     Glicko2 player = newPlayerRating();
      Glicko2 opponent1 = newPlayerRating();
      Glicko2 opponent2 = newPlayerRating();
     
@@ -58,7 +58,7 @@ Compute new rating for a player based on a sequence of match results with other 
      Tuple2<Glicko2, Result> match3 = new Tuple2(opponent1, Glicko2J.Win);
     
      List<Tuple2<Glicko2, Result>> results = Arrays.asList(match1, match2, match3);
-     Glicko2 newRating = Glicko2J.calculateNewRating(playerRating, results);
+     Glicko2 newRating = Glicko2J.calculateNewRating(player, results);
 ``` 
 
 ### Scala
@@ -66,14 +66,17 @@ Compute new rating for a player based on a sequence of match results with other 
 ```scala
     import forwardloop.glicko2s.{Loss, Win, Glicko2}
     
-    val playerRating, opponent1, opponent2 = new Glicko2
-    val results = List((opponent1, Win), (opponent2, Loss), (opponent1, Win))
-    val newRating = playerRating.calculateNewRating(results)
+    val player, opponent1, opponent2 = new Glicko2
+    val results = Seq(
+         (opponent1, Win), 
+         (opponent2, Loss), 
+         (opponent1, Win))
+    val newRating = player.calculateNewRating(results)
 ```
 
 The rating, rating deviation and volatility parameters will change as follows:
 
 ```scala
-    //playerRating.toGlicko1: rating: 1500, deviation: 350.00, volatility: 0.060000
-    //newRating.toGlicko1:    rating: 1600, deviation: 227.74, volatility: 0.059998
+    //player.toGlicko1:    rating: 1500, deviation: 350.00, volatility: 0.060000
+    //newRating.toGlicko1: rating: 1600, deviation: 227.74, volatility: 0.059998
 ```    

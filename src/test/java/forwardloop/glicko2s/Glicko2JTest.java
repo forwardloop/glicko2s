@@ -16,11 +16,11 @@ public class Glicko2JTest {
         Glicko2 opponent1 = newPlayerRating();
         Glicko2 opponent2 = newPlayerRating();
 
-        Tuple2<Glicko2, Result> g1 = new Tuple2(opponent1, Glicko2J.Win);
-        Tuple2<Glicko2, Result> g2 = new Tuple2(opponent2, Glicko2J.Loss);
-        Tuple2<Glicko2, Result> g3 = new Tuple2(opponent1, Glicko2J.Win);
+        Tuple2<Glicko2, EloResult> g1 = new Tuple2(opponent1, Glicko2J.Win);
+        Tuple2<Glicko2, EloResult> g2 = new Tuple2(opponent2, Glicko2J.Loss);
+        Tuple2<Glicko2, EloResult> g3 = new Tuple2(opponent1, Glicko2J.Win);
 
-        List<Tuple2<Glicko2, Result>> results = Arrays.asList(g1, g2, g3);
+        List<Tuple2<Glicko2, EloResult>> results = Arrays.asList(g1, g2, g3);
 
         Glicko2 newRating = Glicko2J.calculateNewRating(playerRating, results);
 
