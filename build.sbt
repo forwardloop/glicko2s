@@ -31,3 +31,8 @@ publishTo := Some(
   else
     Opts.resolver.sonatypeStaging
 )
+
+coverageEnabled := true
+
+scapegoatVersion in ThisBuild := "1.1.0"
+

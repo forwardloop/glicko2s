@@ -5,12 +5,14 @@ import scala.collection.JavaConversions;
 import java.util.List;
 
 /**
- * Scala interop
+ * Java-Scala interop
  */
 public class Glicko2J {
 
     public static final EloResult Win = Win$.MODULE$;
     public static final EloResult Loss = Loss$.MODULE$;
+
+    private Glicko2J(){}
 
     public static Glicko2 newPlayerRating() {
         return new Glicko1(
