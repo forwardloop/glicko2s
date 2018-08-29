@@ -83,7 +83,7 @@ The rating, rating deviation and volatility parameters will change as follows:
     //newRating.toGlicko1: rating: 1600, deviation: 227.74, volatility: 0.059998
 ```    
 
-## Customisation 
+## Customise 
 
 ### Weights of results 
 
@@ -91,3 +91,4 @@ The simple implementation of the `EloResult` trait provided allows three outcome
 weights 1.0, 0.5, 0.0, respectively. This can be fine tuned to differentiate between outcomes like 3:0 and 3:2,
 to better reflect true players' level in ELO computations. An example implementation for racquet sports can be found
 [here](https://github.com/forwardloop/highrung-model/blob/master/src/main/scala/highrung/model/RacquetEloResult.scala)
+
