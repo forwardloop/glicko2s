@@ -31,3 +31,6 @@ publishTo := Some(
   else
     Opts.resolver.sonatypeStaging
 )
+
+scapegoatVersion in ThisBuild := "1.1.0"
+
